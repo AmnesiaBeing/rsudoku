@@ -1,0 +1,23 @@
+.field {
+    width: 360px;
+    height: auto;
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(9, 11.11%);
+    grid-template-rows: repeat(9, 11.11%);
+    justify-items: center;
+    align-items: center;
+    font-size: 10px;
+}
+
+.cell_draft_container {
+    width: 36px;
+    height: auto;
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 33.33%);
+    grid-template-rows: repeat(3, 33.33%);
+    justify-items: center;
+    align-items: center;
+    font-size: 10px;
+}

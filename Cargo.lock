@@ -511,6 +511,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "lib_sudoku_solver"
+version = "0.1.0"
+
+[[package]]
 name = "libc"
 version = "0.2.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -760,6 +764,7 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "dioxus-web",
+ "lib_sudoku_solver",
 ]
 
 [[package]]

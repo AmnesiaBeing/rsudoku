@@ -187,12 +187,12 @@ main {
 .header {
   display: flex;
   justify-content: space-between;
-  height: 40px;
+  height: 48px;
   overflow: hidden;
 }
 
 .header .logo {
-  height: 40px;
+  height: 48px;
 }
 
 .header .side {
@@ -243,7 +243,7 @@ main {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
   grid-gap: 10px;
-  flex-grow: 1;
+  /* flex-grow: 1; */
 }
 
 .btn-num {
@@ -256,10 +256,24 @@ main {
   color: #1e293b;
   border-radius: 8px;
   cursor: pointer;
+  position: relative;
+  aspect-ratio: 1/1;
 }
 
 .btn-num:active {
   background-color: #cbd5e1;
+}
+
+.btn-num-mark {
+  position: absolute;
+  top: 0%; /* 小标与容器顶部距离 */
+  right: 0%; /* 小标与容器右侧距离 */
+  font-size: 16px; /* 小标字体大小 */
+  background-color: red; /* 小标背景色 */
+  color: white; /* 小标文字颜色 */
+  padding: 4px 8px; /* 小标内边距 */
+  border-radius: 50%; /* 小标圆角 */
+  aspect-ratio: 1/1;
 }
 
 .actions {
@@ -653,4 +667,8 @@ main {
 .shortcuts table td,
 .shortcuts table th {
   padding: 5px 10px;
+}
+
+.spacer {
+  flex-grow: 1;
 }

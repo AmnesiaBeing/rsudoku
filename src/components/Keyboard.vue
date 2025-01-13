@@ -114,7 +114,7 @@ const game = {
 </script>
 
 <template>
-  <div class="keyboard mt-3" style="--wails-draggable: no-drag">
+  <div class="keyboard mt-3">
     <div
       class="btn-num"
       v-for="num in numbers"
@@ -122,10 +122,11 @@ const game = {
       @click="onInput(num)"
     >
       {{ num }}
+      <span class="btn-num-mark"> 1 </span>
     </div>
   </div>
 
-  <div class="actions mt-3" style="--wails-draggable: no-drag">
+  <div class="actions mt-3">
     <div class="action-item">
       <div class="btn-action" @click="onErase">
         <svg

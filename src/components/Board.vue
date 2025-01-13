@@ -1,54 +1,46 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 
-// import { computed, ref, watch } from "vue";
-
-// const props = defineProps({
-//   board: Object,
-// });
-
-// // const board = inject('board')
-// const cells = ref(props.board.getCells());
-
-// const grid = computed(() => {
-//   let grid = [];
-//   for (let i = 0; i < 9; i++) {
-//     let rows = [];
-//     for (let j = 0; j < 9; j++) {
-//       let index = i * 9 + j;
-//       rows.push(cells.value[index]);
-//     }
-//     grid.push(rows);
-//   }
-//   return grid;
-// });
-
-// watch(props.board, (newBoard, oldVal) => {
-//   cells.value = newBoard.getCells();
-// });
-
-// // 选中事件
-// const emit = defineEmits(["onSelect"]);
-
-// function onSelect(id) {
-//   props.board.selected = id;
-//   emit("onSelect", cells.value[id]);
-// }
+type Note = [
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean
+];
 
 const grid = computed(() => {
-  let grid = [];
+  let grid: {
+    id: number;
+    class: string;
+    value: string | null;
+    notes: Note;
+  }[][] = [];
   for (let i = 0; i < 9; i++) {
-    let rows = [];
+    let rows: {
+      id: number;
+      class: string;
+      value: string | null;
+      notes: Note;
+    }[] = [];
     for (let j = 0; j < 9; j++) {
       rows.push({
         id: i * 9 + j,
         class: "",
-        value: "9",
-        notes: [],
+        value: null,
+        notes: [false, false, true, false, false, true, false, false, true],
       });
     }
+    grid.push(rows);
   }
+  return grid;
 });
+
+function onSelect(id: number) {}
 </script>
 
 <template>
@@ -65,9 +57,9 @@ const grid = computed(() => {
           <div class="cell-value" v-if="cell.value">
             {{ cell.value }}
           </div>
-          <div class="cell-notes" v-else-if="cell.notes.length">
+          <div class="cell-notes" v-else-if="cell.notes.length > 0">
             <div class="notes-item" v-for="(note, n) in cell.notes" :key="n">
-              {{ note }}
+              {{ note ? n + 1 : " " }}
             </div>
           </div>
         </div>

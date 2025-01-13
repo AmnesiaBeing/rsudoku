@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, inject } from "vue";
 // import { GameState } from "../enum.js";
 
@@ -11,33 +11,23 @@ const game = {
 
 const count = computed(() => {
   let time = game.timer;
-  let hours = parseInt((time / 60 / 60) % 24);
-  let minutes = parseInt((time / 60) % 60);
-  let seconds = parseInt(time % 60);
+  let hours = Math.floor((time / 60 / 60) % 24);
+  let minutes = Math.floor((time / 60) % 60);
+  let seconds = time % 60;
 
   let str = "";
-  str += (hours < 10 ? "0" + hours : hours) + ":";
-  str += (minutes < 10 ? "0" + minutes : minutes) + ":";
-  str += seconds < 10 ? "0" + seconds : seconds;
+  str += `${String(hours).padStart(2, '0')}:`;
+  str += `${String(minutes).padStart(2, '0')}:`;
+  str += `${String(seconds).padStart(2, '0')}`;
   return str;
 });
 
-const emit = defineEmits(["onPause", "onContinue"]);
-
-// 暂停游戏
-function onPause() {
-  game.pause();
-  emit("onPause");
-}
+function onPause() {}
 </script>
 
 <template>
-  <div class="timer mt-3" style="--wails-draggable: no-drag">
-    <div
-      class="btn-pause"
-      @click="onPause"
-      v-if="game.state === 'started'"
-    >
+  <div class="timer mt-3">
+    <div class="btn-pause" @click="onPause" v-if="game.state === 'started'">
       <div class="icon">
         <svg
           t="1716274550137"

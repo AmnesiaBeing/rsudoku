@@ -1,17 +1,10 @@
-<script setup>
-// import { provide, reactive, ref, watch } from "vue";
-// import { GameState } from "../enum.js";
-// import { Sudoku } from "../sudoku.js";
-// import html2canvas from "html2canvas";
-
+<script setup lang="ts">
 import Board from "./Board.vue";
 import Header from "./Header.vue";
 import Timer from "./Timer.vue";
-import Info from "./Info.vue";
 import Keyboard from "./Keyboard.vue";
 import Dialog from "./Dialog.vue";
 import Loading from "./Loading.vue";
-// import { Screenshot } from "../../wailsjs/go/main/App.js";
 
 // const sudoku = reactive(Sudoku());
 // sudoku.init();
@@ -77,15 +70,15 @@ const game = {
 
 <template>
   <main ref="wrapperDom" :class="`state-${game.state}`">
-    <div class="sudoku" style="--wails-draggable: no-drag">
+    <div class="sudoku">
       <Board />
     </div>
 
     <div class="sidebar">
       <Header />
       <Timer />
-      <Info />
-      <Keyboard @onOver="onOver" @onCompleted="onCompleted" />
+      <div class="spacer" />
+      <Keyboard />
     </div>
   </main>
 

@@ -144,10 +144,6 @@ main {
   background-color: #fee2e2;
 }
 
-/* .cell-prompted {
-    background-color: #dcfce7;
-} */
-
 .cell-prompted .cell-value {
   color: #16a34a;
 }
@@ -182,6 +178,10 @@ main {
   overflow: hidden;
   justify-content: center;
   align-items: center;
+}
+
+.cell-notes .notes-item-highlight {
+  color: #cbd5e1;
 }
 
 .header {

@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import { inject } from "vue";
-// const sudoku = inject("sudoku");
-</script>
-
 <template>
   <div class="header">
     <h1 class="logo">

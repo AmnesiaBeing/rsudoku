@@ -1,71 +1,48 @@
 <script setup lang="ts">
+import { provide, reactive } from "vue";
+
 import Board from "./Board.vue";
 import Header from "./Header.vue";
 import Timer from "./Timer.vue";
 import Keyboard from "./Keyboard.vue";
 import Dialog from "./Dialog.vue";
 import Loading from "./Loading.vue";
+import { GameEntity } from "../entities/GameEntity";
+import { GameState } from "../enum";
 
-// const sudoku = reactive(Sudoku());
-// sudoku.init();
-// provide("sudoku", sudoku);
+const game = reactive(new GameEntity());
+provide("game", game);
 
-// // 载入数独游戏选项
-// const options = reactive(sudoku.getOptions());
-// watch(options, (o) => sudoku.setOptions(o));
+function newGame() {
+  game.newGame();
+  game.showMenu = false;
+}
 
-// // 实例化数独游戏
-// const game = reactive(sudoku.game());
-// sudoku.enter(game, options);
-// watch(game, (g) => {
-//   if (g.state === GameState.STARTED) {
-//     sudoku.saveArchive(g);
-//   }
-// });
-// provide("game", game);
+// 继续游戏
+function onContinue() {
+  game.start();
+}
 
-// function newGame(test = false) {
-//   if (test) {
-//     game.test();
-//   } else {
-//     game.new(test ? { difficulty: -1 } : options);
-//   }
-//   sudoku.showMenu = false;
-// }
+function onOver() {
+  game.board.selected = null;
+  game.failure();
+  game.removeArchive();
+}
 
-// // 继续游戏
-// function onContinue() {
-//   game.start();
-// }
+function onCompleted() {
+  game.board.selected = null;
+  game.successful();
+  game.removeArchive();
+}
 
-// function onOver() {
-//   game.board.selected = null;
-//   game.failure();
-//   sudoku.removeArchive();
-// }
+function onOpenMenu() {
+  game.init();
+  game.showMenu = true;
+}
 
-// function onCompleted() {
-//   game.board.selected = null;
-//   game.successful();
-//   sudoku.removeArchive();
-// }
-
-// function onOpenMenu() {
-//   game.init();
-//   sudoku.showMenu = true;
-// }
-
-// function switchLevel(level) {
-//   options.difficulty = level;
-// }
-
-// // TODO 加入保存游戏截图功能
-// const wrapperDom = ref(null);
-// provide("wrapperDom", wrapperDom);
-
-const game = {
-  state: "",
-};
+function switchLevel(level) {
+  game.difficulty = level;
+}
 </script>
 
 <template>
@@ -82,19 +59,19 @@ const game = {
     </div>
   </main>
 
-  <!-- <Dialog
+  <Dialog
     type="menu"
     show-close
     show-quit
     show-info
-    :show-replay="game.state !== 'pending'"
-    v-model:visible="sudoku.showMenu"
+    :show-replay="game.state !== GameState.PENDING"
+    v-model:visible="game.showMenu"
   >
     <h2>选择游戏难度</h2>
     <div class="levels">
       <div
         class="level-item"
-        v-for="(item, i) in sudoku.levels"
+        v-for="(item, i) in game.levels"
         :key="i"
         :class="options.difficulty === i ? 'active' : ''"
         @click="switchLevel(i)"
@@ -105,22 +82,9 @@ const game = {
     <div style="margin-top: 30px; display: flex">
       <div class="btn" @click="newGame()">开始新游戏</div>
     </div>
-    <div
-      class="btn"
-      style="
-        margin-top: 24px;
-        border: 2px dashed #1e293b;
-        background-color: #fff;
-        color: #1e293b;
-      "
-      v-if="sudoku.env.buildType === 'dev'"
-      @click="newGame(true)"
-    >
-      测试
-    </div>
-  </Dialog> -->
+  </Dialog>
 
-  <!-- <Dialog type="help" show-close show-info v-model:visible="sudoku.showHelp">
+  <Dialog type="help" show-close show-info v-model:visible="game.showHelp">
     <div class="help-content">
       <div>
         <h3>数独游戏</h3>
@@ -283,15 +247,15 @@ const game = {
   <Dialog type="loading" :visible="game.state === GameState.LOADING">
     <Loading />
     <h2 style="margin-top: 30px">正在努力的出题中</h2>
-  </Dialog> -->
+  </Dialog>
 
-  <!-- <Dialog
+  <Dialog
     type="pause"
     title="休息一下"
     show-info
     show-replay
     show-quit
-    :visible="game.state === 'paused'"
+    :visible="game.state === GameState.PAUSED"
   >
     <div><img src="../assets/images/pause.svg" /></div>
     <div style="--wails-draggable: no-drag">
@@ -306,7 +270,7 @@ const game = {
     show-replay
     show-quit
     show-screenshot
-    :visible="game.state === 'successful'"
+    :visible="game.state === GameState.SUCCESS"
   >
     <div><img src="../assets/images/successful.svg" /></div>
     <div>
@@ -321,11 +285,11 @@ const game = {
     show-replay
     show-quit
     show-screenshot
-    :visible="game.state === 'failure'"
+    :visible="game.state === GameState.FAILURE"
   >
     <div><img src="../assets/images/failure.svg" /></div>
     <div>
       <div class="btn btn-dark mt-3" @click="onOpenMenu">开始新游戏</div>
     </div>
-  </Dialog> -->
+  </Dialog>
 </template>

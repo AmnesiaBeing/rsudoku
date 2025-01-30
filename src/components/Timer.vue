@@ -1,33 +1,33 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
-// import { GameState } from "../enum.js";
+import { GameState } from "../enum.js";
+import { GameEntity } from "../entities/GameEntity.js";
 
-// const game = inject("game");
-
-const game = {
-  state: "started",
-  timer: 100,
-};
+const game: GameEntity | undefined = inject("game");
 
 const count = computed(() => {
-  let time = game.timer;
-  let hours = Math.floor((time / 60 / 60) % 24);
-  let minutes = Math.floor((time / 60) % 60);
-  let seconds = time % 60;
+  if (game) {
+    let time = game.timer;
+    let hours = Math.floor((time / 60 / 60) % 24);
+    let minutes = Math.floor((time / 60) % 60);
+    let seconds = time % 60;
 
-  let str = "";
-  str += `${String(hours).padStart(2, '0')}:`;
-  str += `${String(minutes).padStart(2, '0')}:`;
-  str += `${String(seconds).padStart(2, '0')}`;
-  return str;
+    let str = "";
+    str += `${String(hours).padStart(2, "0")}:`;
+    str += `${String(minutes).padStart(2, "0")}:`;
+    str += `${String(seconds).padStart(2, "0")}`;
+    return str;
+  }
 });
-
-function onPause() {}
 </script>
 
 <template>
   <div class="timer mt-3">
-    <div class="btn-pause" @click="onPause" v-if="game.state === 'started'">
+    <div
+      class="btn-pause"
+      @click="game?.pause()"
+      v-if="game.state === GameState.STARTED"
+    >
       <div class="icon">
         <svg
           t="1716274550137"

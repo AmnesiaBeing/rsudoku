@@ -9,7 +9,7 @@ const STORAGE_ARCHIVE_KEY = "sudoku-archive";
 
 class archiveGame {
   timer: number = 0;
-  board: any;
+  board: Cell[][] = [];
   difficulty: Difficulty = Difficulty.HARD;
   prompted: number = 0;
   maxPrompts: number = 3;
@@ -18,7 +18,7 @@ class archiveGame {
 export class GameEntity {
   state: GameState;
   timer: number;
-  board: any;
+  board: Cell[][];
   difficulty: Difficulty;
   prompted: number;
   maxPrompts: number;
@@ -41,8 +41,9 @@ export class GameEntity {
       this.maxPrompts = archive.maxPrompts;
     } else {
       this.state = GameState.PENDING;
+      this.showMenu = true; // 处于Pending状态时，需要出现菜单
       this.timer = 0;
-      this.board = {};
+      this.board = [];
       this.difficulty = Difficulty.HARD;
       this.prompted = 0;
       this.maxPrompts = 3;
@@ -104,7 +105,9 @@ export class GameEntity {
 
   startTime() {
     if (timerInterval == null) {
-      timerInterval = setInterval(() => this.timer++, 1000);
+      timerInterval = setInterval(() => {
+        this.timer++;
+      }, 1000);
     }
   }
 

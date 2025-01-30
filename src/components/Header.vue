@@ -1,6 +1,21 @@
+<script setup lang="ts">
+import { inject } from "vue";
+import { GameEntity } from "../entities/GameEntity";
+
+const game: GameEntity | undefined = inject("game");
+
+function onShowHelpClick() {
+  if (game) game.showHelp = true;
+}
+
+function onShowMenuClick() {
+  if (game) game.showMenu = true;
+}
+</script>
+
 <template>
   <div class="header">
-    <h1 class="logo">
+    <h1 class="logo"  @click="onShowMenuClick()">
       <svg
         t="1736773720019"
         class="icon"
@@ -20,7 +35,7 @@
       <span style="margin-left: 10px">数独</span>
     </h1>
     <div class="side">
-      <div class="help">
+      <div class="help" @click="onShowHelpClick()">
         <svg
           t="1736773803900"
           class="icon"

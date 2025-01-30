@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev" : "yarn run wasm:build && yarn run dev:run",
+    "wasm:build": "wasm-pack build --target web ../lib_sudoku_solver",
+    "dev:run": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri"

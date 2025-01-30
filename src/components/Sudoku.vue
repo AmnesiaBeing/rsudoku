@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, reactive } from "vue";
+import { onMounted, onUnmounted, provide, reactive } from "vue";
 
 import Board from "./Board.vue";
 import Header from "./Header.vue";
@@ -8,7 +8,7 @@ import Keyboard from "./Keyboard.vue";
 import Dialog from "./Dialog.vue";
 import Loading from "./Loading.vue";
 import { GameEntity } from "../entities/GameEntity";
-import { GameState } from "../enum";
+import { Difficulty, GameState } from "../enum";
 
 const game = reactive(new GameEntity());
 provide("game", game);
@@ -18,31 +18,30 @@ function newGame() {
   game.showMenu = false;
 }
 
-// 继续游戏
-function onContinue() {
-  game.start();
-}
-
-function onOver() {
-  game.board.selected = null;
-  game.failure();
-  game.removeArchive();
-}
-
-function onCompleted() {
-  game.board.selected = null;
-  game.successful();
-  game.removeArchive();
-}
-
 function onOpenMenu() {
   game.init();
   game.showMenu = true;
 }
 
-function switchLevel(level) {
+function switchLevel(level: Difficulty) {
   game.difficulty = level;
+  game.saveArchive();
 }
+
+// 监听 beforeunload 事件
+function handleBeforeUnload(_event: BeforeUnloadEvent) {
+  game.saveArchive();
+}
+
+// 添加事件监听器
+onMounted(() => {
+  window.addEventListener("beforeunload", handleBeforeUnload);
+});
+
+// 移除事件监听器
+onUnmounted(() => {
+  window.removeEventListener("beforeunload", handleBeforeUnload);
+});
 </script>
 
 <template>
@@ -61,83 +60,92 @@ function switchLevel(level) {
 
   <Dialog
     type="menu"
-    show-close
-    show-quit
-    show-info
-    :show-replay="game.state !== GameState.PENDING"
     v-model:visible="game.showMenu"
+    @click="game.showMenu = !(game.state === GameState.STARTED)"
   >
     <h2>选择游戏难度</h2>
     <div class="levels">
       <div
         class="level-item"
-        v-for="(item, i) in game.levels"
+        v-for="(item, i) in Difficulty"
         :key="i"
-        :class="options.difficulty === i ? 'active' : ''"
-        @click="switchLevel(i)"
+        :class="game.difficulty === item ? 'active' : ''"
+        @click.stop="switchLevel(item)"
       >
-        {{ item.label }}
+        {{ item }}
       </div>
     </div>
     <div style="margin-top: 30px; display: flex">
-      <div class="btn" @click="newGame()">开始新游戏</div>
+      <div class="btn" @click.stop="newGame()">开始新游戏</div>
     </div>
   </Dialog>
 
-  <Dialog type="help" show-close show-info v-model:visible="game.showHelp">
+  <Dialog type="loading" :visible="game.state === GameState.LOADING">
+    <Loading />
+    <h2 style="margin-top: 30px">正在努力的出题中</h2>
+  </Dialog>
+
+  <Dialog
+    type="pause"
+    title="休息一下"
+    :visible="game.state === GameState.PAUSED"
+    @click="game.start()"
+  >
+    <div>
+      <div class="btn btn-dark mt-3" @click="game.start()">继续游戏</div>
+    </div>
+  </Dialog>
+
+  <Dialog
+    type="successful"
+    title="挑战成功"
+    :visible="game.state === GameState.SUCCESS"
+  >
+    <div>
+      <div class="btn btn-dark mt-3" @click="onOpenMenu">开始新游戏</div>
+    </div>
+  </Dialog>
+
+  <Dialog
+    type="failure"
+    title="挑战失败"
+    :visible="game.state === GameState.FAILURE"
+  >
+    <div>
+      <div class="btn btn-dark mt-3" @click="onOpenMenu">开始新游戏</div>
+    </div>
+  </Dialog>
+
+  <Dialog
+    type="help"
+    v-model:visible="game.showHelp"
+    @click="game.showHelp = false"
+  >
     <div class="help-content">
       <div>
         <h3>数独游戏</h3>
         <div>
-          <p>
-            数独是一款源自日本的经典益智游戏，旨在开发和提升逻辑思维能力，无需复杂的数学运算。随着你在这个游戏中的经验积累，你将不仅锻炼智力，还能培养专注力和耐心。
-            更重要的是，你将学会如何构建和跟随逻辑推理链，从而解决问题。
-          </p>
           <h4>游戏规则</h4>
           <ol>
-            <li>
-              <b>数独网格：</b> 数独网格是由一个 9x9 的格子组成，被进一步划分为
-              9 个 3x3 的子网格（或称为“宫”）。
-            </li>
             <li>
               <b>开始游戏：</b>
               游戏开始时，一些单元格已经被填入数字，这些数字是游戏的提示数字。玩家需要根据这些提示来填写剩余的空白单元格。
             </li>
             <li>
-              <b>游戏目标：</b> 游戏目标是在每个宫、每行和每列中填入数字 1 到
-              9，确保每个数字在每个宫、每行和每列中只出现一次。
+              <b>游戏目标：</b>
+              游戏目标是在每个宫、每行和每列中填入数字1到9，确保每个数字在每个宫、每行和每列中只出现一次。
             </li>
+            <li><b>答案提示：</b> 每局游戏最多提供<b>3</b>次提示答案机会。</li>
             <li>
-              <b>答案提示：</b> 每局游戏最多提供
-              <b>3</b> 个空白单元格的提示答案机会。
-            </li>
-            <li>
-              <b>挑战失败：</b> 每局游戏最多允许输入错误次数为 <b>2</b> 次，在第
-              <b>3</b> 次输入错误时会提示挑战失败。
-            </li>
-            <li>
-              <b>挑战成功：</b> 在成功填写完整所有宫格后，将提示挑战成功。
+              <b>挑战成功：</b> 在成功填写完整所有宫格且正确后，将提示挑战成功。
             </li>
           </ol>
-          <h4>游戏界面</h4>
-          <p>为了方便游戏的过程，游戏为用户提供了具有特殊的功能界面：</p>
-          <ul>
-            <li>
-              游戏左边部分为网格区域，用于显示最终网格的答题结果，功能包括选中单元格、填数、笔记、提示、错误等结果
-            </li>
-            <li>
-              游戏右边部分为操作区域，用于答题的输入操作，功能包括开始新游戏、游戏计时、暂停游戏、继续游戏、数字输入、笔记输入、擦除、切换笔记模式、提示、重新挑战、退出游戏等功能操作
-            </li>
-          </ul>
           <h4>游戏功能</h4>
           <ol>
             <li>
               <b>开始新游戏：</b>
               点击后，系统将根据你选择的游戏难度，生成一个全新的数独游戏，包含全新的数字组合，为玩家提供全新的挑战。
-            </li>
-            <li>
-              <b>重新挑战：</b>
-              点击后，系统将正在进行中的游戏重置为原来开始的游戏，并重新计时。
+              游戏会自动填写所有格子排除行列宫的可能的笔记。
             </li>
             <li>
               <b>暂停游戏：</b> 点击后，游戏将暂停计时，并隐藏所有已填的数字。
@@ -162,44 +170,6 @@ function switchLevel(level) {
               点击后，直接关闭并退出数独游戏软件，若你在游戏中退出，系统会保存记录，在下次打开游戏的时候，直接还原上次的游戏记录。
             </li>
           </ol>
-          <h4>游戏策略</h4>
-          <ol>
-            <li>
-              <b>观察与分析：</b>
-              首先，观察游戏板上的数字分布，找出可能的填入位置。
-            </li>
-            <li>
-              <b>使用排除法：</b>
-              如果某个宫、行或列中已经有了某些数字，那么在其他位置填入这些数字就是不可能的。
-            </li>
-            <li>
-              <b>标记与假设：</b>
-              可以使用铅笔在可能的填入位置做标记，或者假设某个位置填入某个数字，然后看这是否会导致矛盾。
-            </li>
-            <li><b>逐步解决：</b> 从简单的部分开始，逐步解决整个数独网格。</li>
-          </ol>
-          <h4>游戏优点</h4>
-          <ol>
-            <li>
-              <b>智力提升：</b>
-              通过解决数独问题，玩家可以锻炼逻辑思维和解决问题的能力。
-            </li>
-            <li>
-              <b>专注力训练：</b>
-              数独需要玩家长时间集中注意力，因此可以提高专注力。
-            </li>
-            <li>
-              <b>耐心培养：</b> 解决复杂的数独问题可能需要花费大量时间和耐心。
-            </li>
-            <li>
-              <b>逻辑推理链的建立：</b>
-              通过观察和分析游戏板，玩家可以学习如何建立有效的逻辑推理链。
-            </li>
-          </ol>
-
-          <p>
-            通过逐步填充这些空白单元格，你将体验到逻辑思维的乐趣和挑战。数独游戏因其简单易懂、老少皆宜的特点，在全球范围内都受到了广泛的欢迎。
-          </p>
         </div>
       </div>
       <div class="shortcuts">
@@ -241,55 +211,6 @@ function switchLevel(level) {
           </table>
         </div>
       </div>
-    </div>
-  </Dialog>
-
-  <Dialog type="loading" :visible="game.state === GameState.LOADING">
-    <Loading />
-    <h2 style="margin-top: 30px">正在努力的出题中</h2>
-  </Dialog>
-
-  <Dialog
-    type="pause"
-    title="休息一下"
-    show-info
-    show-replay
-    show-quit
-    :visible="game.state === GameState.PAUSED"
-  >
-    <div><img src="../assets/images/pause.svg" /></div>
-    <div style="--wails-draggable: no-drag">
-      <div class="btn btn-dark mt-3" @click="onContinue">继续游戏</div>
-    </div>
-  </Dialog>
-
-  <Dialog
-    type="successful"
-    title="挑战成功"
-    show-info
-    show-replay
-    show-quit
-    show-screenshot
-    :visible="game.state === GameState.SUCCESS"
-  >
-    <div><img src="../assets/images/successful.svg" /></div>
-    <div>
-      <div class="btn btn-dark mt-3" @click="onOpenMenu">开始新游戏</div>
-    </div>
-  </Dialog>
-
-  <Dialog
-    type="failure"
-    title="挑战失败"
-    show-info
-    show-replay
-    show-quit
-    show-screenshot
-    :visible="game.state === GameState.FAILURE"
-  >
-    <div><img src="../assets/images/failure.svg" /></div>
-    <div>
-      <div class="btn btn-dark mt-3" @click="onOpenMenu">开始新游戏</div>
     </div>
   </Dialog>
 </template>

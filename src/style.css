@@ -607,8 +607,8 @@ main {
 }
 
 .help-content {
-  width: 600px;
-  height: 560px;
+  width: 80vw;
+  height: 95vh;
   overflow-y: scroll;
   line-height: 1.6em;
 }

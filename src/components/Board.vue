@@ -1,39 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-type Drafts = [
-  boolean,
-  boolean,
-  boolean,
-  boolean,
-  boolean,
-  boolean,
-  boolean,
-  boolean,
-  boolean
-];
-
-type GridRender = {
-  id: number;
-  r: number;
-  c: number;
-  g: number;
-  n: number;
-  cell_class: string;
-  value: string | null;
-  drafts: Drafts;
-};
-
-const hoveredCell = ref<GridRender | null>(null);
+const hoveredCell = ref<Cell | null>(null);
 
 const grid_render = computed(() => {
-  let grid: GridRender[][] = [];
+  let grid: Cell[][] = [];
   for (let r = 0; r < 9; r++) {
-    let rows: GridRender[] = [];
+    let rows: Cell[] = [];
     for (let c = 0; c < 9; c++) {
       let g = Math.floor(r / 3) * 3 + Math.floor(c / 3);
       let n = r * 9 + c;
-      let cell_class = "";
 
       rows.push({
         id: r * 9 + c,
@@ -41,7 +17,6 @@ const grid_render = computed(() => {
         c,
         g,
         n,
-        cell_class,
         value: null,
         drafts: [false, false, true, false, false, true, false, false, true],
       });
@@ -51,18 +26,17 @@ const grid_render = computed(() => {
   return grid;
 });
 
-function onSelect(cell: GridRender) {}
+function onSelect(cell: Cell) {}
 
-function onHover(cell: GridRender) {
+function onHover(cell: Cell) {
   hoveredCell.value = cell;
 }
 
 function onLeave() {
-  console.log("leave");
   hoveredCell.value = null;
 }
 
-function isHighlighted(cell: GridRender) {
+function isHighlighted(cell: Cell) {
   if (hoveredCell.value) {
     const { r: r1, c: c1, g: g1 } = hoveredCell.value;
     const { r: r2, c: c2, g: g2 } = cell;
@@ -86,7 +60,7 @@ function isHighlighted(cell: GridRender) {
           <div class="cell-value" v-if="cell.value">
             {{ cell.value }}
           </div>
-          <div class="cell-notes" v-else-if="cell.drafts.length > 0">
+          <div class="cell-notes" v-else-if="cell.drafts">
             <div
               class="notes-item"
               :class="note ? 'notes-item-highlight' : ''"

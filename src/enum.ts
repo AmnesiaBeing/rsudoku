@@ -8,9 +8,9 @@ export enum GameState {
 }
 
 export enum Difficulty {
-  EASY,
-  NORMAL,
-  MIDIUM,
-  HARD,
-  EXPERT,
+  EASY = "简单",
+  NORMAL = "普通",
+  MIDIUM = "中等",
+  HARD = "困难",
+  EXPERT = "专家",
 }

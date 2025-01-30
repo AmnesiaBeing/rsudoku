@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed } from "vue";
 
 const props = defineProps({
   type: String,
@@ -15,7 +15,11 @@ const emit = defineEmits(["update:visible"]);
 </script>
 
 <template>
-  <div class="dialog" :class="classes" v-if="props.visible">
+  <div
+    class="dialog"
+    :class="classes"
+    v-if="props.visible"
+  >
     <div class="dialog-main">
       <div class="dialog-content">
         <h2 v-if="props.title">{{ props.title }}</h2>

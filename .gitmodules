@@ -1,0 +1,3 @@
+[submodule "lib_sudoku_solver"]
+	path = lib_sudoku_solver
+	url = https://github.com/AmnesiaBeing/lib_sudoku_solver.git

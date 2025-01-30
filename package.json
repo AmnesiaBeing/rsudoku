@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev" : "yarn run wasm:build && yarn run dev:run",
-    "wasm:build": "wasm-pack build --target web ../lib_sudoku_solver",
+    "dev": "yarn run wasm:build && yarn run dev:run",
+    "wasm:build": "cd lib_sudoku_solver && wasm-pack build --target web --out-dir ../src/wasm",
     "dev:run": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
@@ -14,14 +14,17 @@
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "@vueuse/core": "^12.5.0",
     "js-base64": "^3.7.7",
     "vue": "^3.5.13"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue-jsx": "^4.1.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.3",
+    "vite-plugin-wasm": "^3.4.1",
     "vue-tsc": "^2.1.10"
   }
 }

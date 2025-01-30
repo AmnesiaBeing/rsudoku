@@ -3,6 +3,8 @@
 import { GameState, Difficulty } from "../enum";
 import { Base64 } from "js-base64";
 
+import init, { Sudoku } from "../wasm/lib_sudoku_solver.js";
+
 let timerInterval: number | null = null;
 
 const STORAGE_ARCHIVE_KEY = "sudoku-archive";
@@ -48,6 +50,8 @@ export class GameEntity {
       this.prompted = 0;
       this.maxPrompts = 3;
     }
+
+    init();
   }
 
   init() {
@@ -96,9 +100,22 @@ export class GameEntity {
     this.init();
     this.loading();
 
-    // let res = await Generate({ difficulty: options.difficulty });
-    // this.board.solution = res.solution;
-    // this.board.subject = res.subject;
+    const sudoku = new Sudoku("hard");
+    sudoku.puzzle.forEach((v, i) => {
+      const r = Math.ceil(i / 9);
+      const c = i % 9;
+      const g = 0;
+      const n = 0;
+      this.board[i / 9][i % 9] = {
+        id: i,
+        r,
+        c,
+        g,
+        n,
+        value: v,
+        drafts: [false, false, false, false, false, false, false, false, false],
+      };
+    });
 
     this.start();
   }

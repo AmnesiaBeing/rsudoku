@@ -1,30 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
+import { GameEntity } from "../entities/GameEntity";
+import { Cell } from "../types";
 
 const hoveredCell = ref<Cell | null>(null);
 
-const grid_render = computed(() => {
-  let grid: Cell[][] = [];
-  for (let r = 0; r < 9; r++) {
-    let rows: Cell[] = [];
-    for (let c = 0; c < 9; c++) {
-      let g = Math.floor(r / 3) * 3 + Math.floor(c / 3);
-      let n = r * 9 + c;
+const game: GameEntity | undefined = inject("game");
 
-      rows.push({
-        id: r * 9 + c,
-        r,
-        c,
-        g,
-        n,
-        value: null,
-        drafts: [false, false, true, false, false, true, false, false, true],
-      });
-    }
-    grid.push(rows);
-  }
-  return grid;
-});
+const grid_render = game?.board;
 
 function onSelect(cell: Cell) {}
 

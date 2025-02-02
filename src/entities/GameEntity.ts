@@ -4,6 +4,7 @@ import { GameState, Difficulty } from "../enum";
 import { Base64 } from "js-base64";
 
 import init, { Sudoku } from "../wasm/lib_sudoku_solver.js";
+import { Cell, DraftsDefault } from "../types.js";
 
 let timerInterval: number | null = null;
 
@@ -101,21 +102,20 @@ export class GameEntity {
     this.loading();
 
     const sudoku = new Sudoku("hard");
-    sudoku.puzzle.forEach((v, i) => {
-      const r = Math.ceil(i / 9);
-      const c = i % 9;
-      const g = 0;
-      const n = 0;
-      this.board[i / 9][i % 9] = {
-        id: i,
-        r,
-        c,
-        g,
-        n,
-        value: v,
-        drafts: [false, false, false, false, false, false, false, false, false],
-      };
-    });
+    for (let r = 0; r < 9; r++) {
+      this.board[r] = [];
+      for (let c = 0; c < 9; c++) {
+        this.board[r][c] = {
+          id: r * 9 + c,
+          r,
+          c,
+          g: Math.floor(r / 3) * 3 + Math.floor(c / 3),
+          n: (r % 3) * 3 + (c % 3),
+          value: sudoku.puzzle[r * 9 + c],
+          drafts: DraftsDefault,
+        };
+      }
+    }
 
     this.start();
   }
@@ -156,4 +156,6 @@ export class GameEntity {
       localStorage.removeItem(STORAGE_ARCHIVE_KEY);
     }
   }
+
+  setCellValue(cell: Cell) {}
 }

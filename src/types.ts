@@ -1,4 +1,23 @@
-type Drafts = [
+export enum CellStatus {
+  FIXED,
+  DRAFT,
+  SOLVE,
+}
+
+export enum CellValue {
+  INVAILD = 0,
+  V1 = 1,
+  V2 = 2,
+  V3 = 3,
+  V4 = 4,
+  V5 = 5,
+  V6 = 6,
+  V7 = 7,
+  V8 = 8,
+  V9 = 9,
+}
+
+export type Drafts = [
   boolean,
   boolean,
   boolean,
@@ -10,12 +29,24 @@ type Drafts = [
   boolean
 ];
 
-type Cell = {
+export const DraftsDefault: Drafts = [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+];
+
+export type Cell = {
   id: number;
   r: number;
   c: number;
   g: number;
   n: number;
-  value: number | null; // 0-8 null
-  drafts: Drafts | null;
+  value: CellValue;
+  drafts: Drafts;
 };
